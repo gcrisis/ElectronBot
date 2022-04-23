@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file    i2c.h
+  * @file    gpio.h
   * @brief   This file contains all the function prototypes for
-  *          the i2c.c file
+  *          the gpio.c file
   ******************************************************************************
   * @attention
   *
@@ -17,8 +17,8 @@
   ******************************************************************************
   */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __I2C_H__
-#define __I2C_H__
+#ifndef __GPIO_H__
+#define __GPIO_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,21 +32,18 @@ extern "C" {
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */
-extern uint8_t i2cDataRx[8];
-extern uint8_t i2cDataTx[8];
+
 /* USER CODE END Private defines */
 
+void MX_GPIO_Init(void);
+
 /* USER CODE BEGIN Prototypes */
-void MY_I2C1_Init(uint32_t _id);
-void set_id(uint8_t _id);
-void I2C_SlaveDMATxCpltCallback();
-void I2C_SlaveDMARxCpltCallback();
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* __I2C_H__ */
+#endif /*__ GPIO_H__ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

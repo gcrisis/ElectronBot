@@ -1,7 +1,7 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    stm32f0xx_it.c
+  * @file    stm32f4xx_it.c
   * @brief   Interrupt Service Routines.
   ******************************************************************************
   * @attention
@@ -20,9 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "tim.h"
-#include "i2c.h"
-#include "stm32f0xx_it.h"
+#include "stm32f4xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -58,13 +56,16 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-
+extern UART_HandleTypeDef huart1;
+extern UART_HandleTypeDef huart2;
+extern DMA_HandleTypeDef hdma_usart1_rx;
+extern DMA_HandleTypeDef hdma_usart1_tx;
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
 
 /******************************************************************************/
-/*           Cortex-M0 Processor Interruption and Exception Handlers          */
+/*           Cortex-M4 Processor Interruption and Exception Handlers          */
 /******************************************************************************/
 /**
   * @brief This function handles Non maskable interrupt.
@@ -97,16 +98,74 @@ void HardFault_Handler(void)
 }
 
 /**
+  * @brief This function handles Memory management fault.
+  */
+void MemManage_Handler(void)
+{
+  /* USER CODE BEGIN MemoryManagement_IRQn 0 */
+
+  /* USER CODE END MemoryManagement_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+    /* USER CODE END W1_MemoryManagement_IRQn 0 */
+  }
+}
+
+/**
+  * @brief This function handles Pre-fetch fault, memory access fault.
+  */
+void BusFault_Handler(void)
+{
+  /* USER CODE BEGIN BusFault_IRQn 0 */
+
+  /* USER CODE END BusFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_BusFault_IRQn 0 */
+    /* USER CODE END W1_BusFault_IRQn 0 */
+  }
+}
+
+/**
+  * @brief This function handles Undefined instruction or illegal state.
+  */
+void UsageFault_Handler(void)
+{
+  /* USER CODE BEGIN UsageFault_IRQn 0 */
+
+  /* USER CODE END UsageFault_IRQn 0 */
+  while (1)
+  {
+    /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+    /* USER CODE END W1_UsageFault_IRQn 0 */
+  }
+}
+
+/**
   * @brief This function handles System service call via SWI instruction.
   */
 void SVC_Handler(void)
 {
-  /* USER CODE BEGIN SVC_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 0 */
 
-  /* USER CODE END SVC_IRQn 0 */
-  /* USER CODE BEGIN SVC_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 0 */
+  /* USER CODE BEGIN SVCall_IRQn 1 */
 
-  /* USER CODE END SVC_IRQn 1 */
+  /* USER CODE END SVCall_IRQn 1 */
+}
+
+/**
+  * @brief This function handles Debug monitor.
+  */
+void DebugMon_Handler(void)
+{
+  /* USER CODE BEGIN DebugMonitor_IRQn 0 */
+
+  /* USER CODE END DebugMonitor_IRQn 0 */
+  /* USER CODE BEGIN DebugMonitor_IRQn 1 */
+
+  /* USER CODE END DebugMonitor_IRQn 1 */
 }
 
 /**
@@ -130,113 +189,70 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-
+  HAL_IncTick();
   /* USER CODE BEGIN SysTick_IRQn 1 */
 
   /* USER CODE END SysTick_IRQn 1 */
 }
 
 /******************************************************************************/
-/* STM32F0xx Peripheral Interrupt Handlers                                    */
+/* STM32F4xx Peripheral Interrupt Handlers                                    */
 /* Add here the Interrupt Handlers for the used peripherals.                  */
 /* For the available peripheral interrupt handler names,                      */
-/* please refer to the startup file (startup_stm32f0xx.s).                    */
+/* please refer to the startup file (startup_stm32f4xx.s).                    */
 /******************************************************************************/
-
-/**
-  * @brief This function handles DMA1 channel 1 interrupt.
-  */
-void DMA1_Channel1_IRQHandler(void)
+void DMA2_Stream2_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
-    LL_DMA_ClearFlag_TC1(DMA1);
-    LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_1);
-    LL_DMA_SetDataLength(DMA1,LL_DMA_CHANNEL_1,1);
-  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 0 */
 
-  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+  /* USER CODE END DMA1_Stream5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart1_rx);
+  /* USER CODE BEGIN DMA1_Stream5_IRQn 1 */
 
-  /* USER CODE END DMA1_Channel1_IRQn 1 */
+  /* USER CODE END DMA1_Stream5_IRQn 1 */
 }
-void DMA1_Channel2_3_IRQHandler(void)
+void DMA2_Stream7_IRQHandler(void)
 {
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 0 */
-    if(LL_DMA_IsActiveFlag_TC3(DMA1))
-    {
-        //LL_DMA_ClearFlag_GI3(DMA1);
-        LL_DMA_ClearFlag_TC3(DMA1);
-        
-        I2C_SlaveDMARxCpltCallback();  
-        LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_3);
-        LL_DMA_SetDataLength(DMA1,LL_DMA_CHANNEL_3,5);      
-    }
-    else if (LL_DMA_IsActiveFlag_TC2(DMA1))
-    {
-        LL_DMA_ClearFlag_TC2(DMA1);
-        I2C_SlaveDMATxCpltCallback();
-        LL_DMA_DisableChannel(DMA1,LL_DMA_CHANNEL_2);    
-        LL_DMA_SetDataLength(DMA1,LL_DMA_CHANNEL_2,5);
-    }
-    
-  /* USER CODE END DMA1_Channel2_3_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Stream6_IRQn 0 */
 
-  /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
+  /* USER CODE END DMA1_Stream6_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart1_tx);
+  /* USER CODE BEGIN DMA1_Stream6_IRQn 1 */
 
-  /* USER CODE END DMA1_Channel2_3_IRQn 1 */
+  /* USER CODE END DMA1_Stream6_IRQn 1 */
 }
-/**
-  * @brief This function handles ADC interrupt.
-  */
-void ADC1_IRQHandler(void)
-{
-  /* USER CODE BEGIN ADC1_IRQn 0 */
-    LL_ADC_ClearFlag_ADRDY(ADC1);
-  /* USER CODE END ADC1_IRQn 0 */
-  /* USER CODE BEGIN ADC1_IRQn 1 */
 
-  /* USER CODE END ADC1_IRQn 1 */
+void USART1_IRQHandler(void)
+{
+  /* USER CODE BEGIN USART1_IRQn 0 */
+
+  /* USER CODE END USART1_IRQn 0 */
+  HAL_UART_IRQHandler(&huart1);
+  /* USER CODE BEGIN USART1_IRQn 1 */
+
+  /* USER CODE END USART1_IRQn 1 */
 }
 
 /**
-  * @brief This function handles TIM14 global interrupt.
+  * @brief This function handles USART2 global interrupt.
   */
-void TIM14_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-  /* USER CODE BEGIN TIM14_IRQn 0 */
-    TIM14_PeriodElapsedCallback();
-    LL_TIM_ClearFlag_UPDATE(TIM14);
-  /* USER CODE END TIM14_IRQn 0 */
-  /* USER CODE BEGIN TIM14_IRQn 1 */
+  /* USER CODE BEGIN USART2_IRQn 0 */
 
-  /* USER CODE END TIM14_IRQn 1 */
+  /* USER CODE END USART2_IRQn 0 */
+  HAL_UART_IRQHandler(&huart2);
+  /* USER CODE BEGIN USART2_IRQn 1 */
+
+  /* USER CODE END USART2_IRQn 1 */
 }
+/**
+  * @brief This function handles USART1 global interrupt.
+  */
 
 /**
-  * @brief This function handles I2C1 event global interrupt / I2C1 wake-up interrupt through EXTI line 23.
+  * @brief This function handles TIM7 global interrupt.
   */
-void I2C1_IRQHandler(void)
-{
-  /* USER CODE BEGIN I2C1_IRQn 0 */
-    if(LL_I2C_IsActiveFlag_ADDR(I2C1))
-    {
-        if(LL_I2C_GetTransferDirection(I2C1) == LL_I2C_DIRECTION_WRITE)
-        {
-            LL_DMA_EnableChannel(DMA1,LL_DMA_CHANNEL_3);
-        }
-        else
-        { 
-            LL_DMA_EnableChannel(DMA1,LL_DMA_CHANNEL_2);  
-        }
-        /* Clear ADDR flag value in ISR register */
-        LL_I2C_ClearFlag_ADDR(I2C1);
-    }
-
-  /* USER CODE END I2C1_IRQn 0 */
-
-  /* USER CODE BEGIN I2C1_IRQn 1 */
-
-  /* USER CODE END I2C1_IRQn 1 */
-}
 
 /* USER CODE BEGIN 1 */
 
