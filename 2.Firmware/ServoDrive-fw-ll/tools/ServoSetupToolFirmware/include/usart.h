@@ -31,6 +31,14 @@ extern "C" {
 #define UART_TXBUFF_SIZE 16
 #define UART_RXBUFF_SIZE 8
 
+#if defined (STM32F103xE)
+#define USART1_TX_DMA_CHANNEL             DMA1_Channel4
+#define USART1_RX_DMA_CHANNEL             DMA1_Channel5
+#endif
+#if defined (STM32F446xE)
+#define USART1_TX_DMA_CHANNEL             DMA2_Stream7
+#define USART1_RX_DMA_CHANNEL             DMA2_Stream2
+#endif
 /* USER CODE END Includes */
 
 extern UART_HandleTypeDef huart1;

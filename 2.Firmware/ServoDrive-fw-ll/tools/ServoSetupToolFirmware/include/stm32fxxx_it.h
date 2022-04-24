@@ -43,7 +43,14 @@
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-
+#if defined (STM32F103xE)
+#define USARTx_DMA_TX_IRQHandler          DMA1_Channel4_IRQHandler
+#define USARTx_DMA_RX_IRQHandler          DMA1_Channel5_IRQHandler
+#endif
+#if defined (STM32F446xE)
+#define USARTx_DMA_TX_IRQHandler          DMA2_Stream7_IRQHandler
+#define USARTx_DMA_RX_IRQHandler          DMA2_Stream2_IRQHandler
+#endif
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
@@ -56,8 +63,8 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-void DMA2_Stream2_IRQHandler(void);
-void DMA2_Stream7_IRQHandler(void);
+void USARTx_DMA_TX_IRQHandler(void);
+void USARTx_DMA_RX_IRQHandler(void);
 void USART1_IRQHandler(void);
 void USART2_IRQHandler(void);
 /* USER CODE BEGIN EFP */

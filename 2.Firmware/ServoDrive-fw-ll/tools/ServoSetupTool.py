@@ -72,6 +72,9 @@ def btncom_callback():
         d =bytes.fromhex('010000000000')
         if ser_write_read(d) is False:
             ser.close()
+            t=threading.Timer(1,period_run)
+            t.setDaemon(True)
+            t.start()
             info_label.config(textvariable=StringVar(value='端口错误'))
             return
         entry_com['state'] = 'disable'
@@ -272,13 +275,13 @@ root.protocol('WM_DELETE_WINDOW',close_window)
 labelframe1 = tk.LabelFrame(root,height='100',width='100',text='地址')
 labelframe1.place(relx=0.05,rely=0.02,relwidth=0.9,relheight=0.25)
 
-label1=tk.Label(labelframe1,text='I2C地址：')
-label1.place(relx=0.03,rely=0.16)
+label_addr=tk.Label(labelframe1,text='I2C地址：')
+label_addr.place(relx=0.03,rely=0.16)
 
 entry_addr = tk.Entry(labelframe1,validate = "key",validatecommand=(lambda:entry_edit_callback(entry_addr)))
 entry_addr.config(textvariable=StringVar(value="0"))
 entry_addr.place(relx=0.23,rely=0.16,relwidth=0.1)
-entry_addr.bind("<Return>",lambda _:enter_callback(entry_addr,'21'))
+entry_addr.bind("<Return>",lambda _:enter_callback(entry_addr,''))
 
 checkbox_var = tk.StringVar(value='0')
 checkbox = tk.Checkbutton(labelframe1,text='Enabled',variable=checkbox_var,command=checkbox_callback)

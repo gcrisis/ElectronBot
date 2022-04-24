@@ -28,7 +28,11 @@ extern "C" {
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+#if defined (STM32F103xE)
+#include "stm32f1xx_hal.h"
+#elif defined (STM32F446xE)
 #include "stm32f4xx_hal.h"
+#endif
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */

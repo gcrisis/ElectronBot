@@ -76,7 +76,9 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+#if defined (STM32F446xE)
     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
+#endif
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* I2C1 clock enable */

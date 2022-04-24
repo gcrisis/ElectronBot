@@ -35,6 +35,18 @@ extern "C" {
 
 /* USER CODE BEGIN Private defines */
 
+#if defined (STM32F103xE)
+#define DMA_CLK_ENABLE()                    __HAL_RCC_DMA1_CLK_ENABLE()                                       
+#define USART1_DMA_TX_IRQn                DMA1_Channel4_IRQn
+#define USART1_DMA_RX_IRQn                DMA1_Channel5_IRQn
+#endif
+
+#if defined (STM32F446xE)
+#define DMA_CLK_ENABLE()                   __HAL_RCC_DMA2_CLK_ENABLE()
+#define USART1_DMA_TX_IRQn                DMA2_Stream7_IRQn
+#define USART1_DMA_RX_IRQn                DMA2_Stream2_IRQn
+#endif
+
 /* USER CODE END Private defines */
 
 void MX_DMA_Init(void);

@@ -20,9 +20,11 @@
   * 1、串口中断接收总是溢出，清除溢出标志要先读SR在读DR，官方提供的clear方法已经完成了这两个动作；
   * 2、换用DMA接收目前没有遇到错误，也不会卡死，后续继续观察。使用hal库dma除了需要开启dma中断，
   *     还要开启串口中断，hal库会打开串口的错误中断，
-  * 3、通信是不要使用0，因为0作为字符串的结尾标志可能会造成麻烦。
+  * 3、通信过程不要使用0，因为0作为字符串的结尾标志可能会造成麻烦。
   * 4、操作字符串切记最后有个\0结尾，在分配空间的时候不要忘记给它留个位置，否则会覆盖后边的代码，
   *     导致未知的错误发生。也就是说最少要分配[最大有用字符+1]个字节。
+  * 
+  * 
   * 
   * 00：保留   
   * 01：从机id      回传'f' for failed
@@ -127,12 +129,11 @@ int main(void)
   {
     /* USER CODE END WHILE */
     // // HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_1);
-    // //printf("teee\n");
     // printf("i2c:%x %x %x %x %x %x\n",i2cTxData[0],i2cTxData[1],i2cTxData[2],i2cTxData[3],i2cTxData[4],i2cTxData[5]);
     // printf("uart:%x %x %x %x %x %x\n",uart_tx_buff[0],uart_tx_buff[1],uart_tx_buff[2],uart_tx_buff[3],uart_tx_buff[4],uart_tx_buff[5]);
     // printf("strlen %d\n",trans_lens);
-    // HAL_Delay(1000);
-     HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON,PWR_SLEEPENTRY_WFI);
+    //  HAL_Delay(1000);
+    //HAL_PWR_EnterSLEEPMode(PWR_LOWPOWERREGULATOR_ON,PWR_SLEEPENTRY_WFI);
     // HAL_PWR_EnterSTOPMode(PWR_MAINREGULATOR_ON,PWR_SLEEPENTRY_WFE);
     /* USER CODE BEGIN 3 */
   }
@@ -143,6 +144,49 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
+
+#if defined (STM32F103xE)
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USB;
+  PeriphClkInit.UsbClockSelection = RCC_USBCLKSOURCE_PLL_DIV1_5;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+#elif defined(STM32F446xE)
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -189,7 +233,7 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 }
-
+#endif 
 
 HAL_StatusTypeDef TransmitAndReceiveI2cPacket(uint8_t _id)
 {

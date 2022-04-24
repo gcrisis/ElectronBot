@@ -63,12 +63,21 @@
   */
 void HAL_MspInit(void)
 {
+#if defined (STM32F103xE)
+    __HAL_RCC_AFIO_CLK_ENABLE();
+  /** DISABLE: JTAG-DP Disabled and SW-DP Disabled
+  */
+  __HAL_AFIO_REMAP_SWJ_DISABLE();
+
+#elif defined (STM32F446xE)
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+#endif
+    __HAL_RCC_PWR_CLK_ENABLE();
   /* USER CODE BEGIN MspInit 0 */
 
   /* USER CODE END MspInit 0 */
 
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  __HAL_RCC_PWR_CLK_ENABLE();
+
 
   /* System interrupt init*/
 
