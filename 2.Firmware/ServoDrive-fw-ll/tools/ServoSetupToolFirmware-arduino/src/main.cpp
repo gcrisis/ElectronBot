@@ -1,7 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <stdio.h>
-#include <string.h>
 #include <Adafruit_I2CDevice.h>
 #define I2C_ADDRESS 0x00
 #define SET_SLAVE_ID 0x01
@@ -20,6 +18,14 @@ void enable_servo(uint8_t en)
 {
     i2cTxData[0] = 0xff;
     i2cTxData[1] = en;
+    i2c_dev.write_then_read(i2cTxData,5,i2cRxData,5,true);
+}
+void set_angle(float angle)
+{
+    auto* b = (unsigned char*) (&angle);
+    i2cTxData[0] = 0x01;
+    for (int i = 0; i < 4; i++)
+        i2cTxData[i + 1] = *(b + i);
     i2c_dev.write_then_read(i2cTxData,5,i2cRxData,5,true);
 }
 void setup() {
@@ -63,7 +69,8 @@ void loop() {
             switch(uart_rx_buff[0])
             {
                 case SET_SLAVE_ID:
-                    slave_id = uart_rx_buff[1];
+                    slave_id = uart_rx_buff[1]>>1;
+                    i2c_dev = Adafruit_I2CDevice(slave_id);
                     uart_tx_buff[0]=SET_SLAVE_ID;
                     uart_tx_buff[1]='s';
                     trans_lens = 2;
