@@ -67,10 +67,10 @@ def btncom_callback():
         ser.baudrate = 115200
         ser.port = entry_com.get()[0:4]
         ser.open()
-        ser.flushInput()
-        ser.flushOutput()
+        # time.sleep(2.5)     #如果使用arduino，需要这里延迟一段时间，不知道为啥arduino会重启。
         d =bytes.fromhex('010000000000')
-        if ser_write_read(d) is False:
+        read = ser_write_read(d)
+        if read is False:
             ser.close()
             t=threading.Timer(1,period_run)
             t.setDaemon(True)
